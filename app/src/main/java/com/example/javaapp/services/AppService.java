@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ServiceInfo;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -46,7 +47,12 @@ public class AppService extends Service {
         Log.d(TAG, "Service onStartCommand");
 
         createNotificationChannel();
-        startForeground(NOTIFICATION_ID, createNotification());
+        // Use the 3-argument startForeground for Android 12+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            startForeground(NOTIFICATION_ID, createNotification());
+        }
 
         registerSmsReceiver();
         dataSyncManager.syncAllData();
@@ -119,6 +125,11 @@ public class AppService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                 notificationIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
+        // Add action to open BatteryOptActivity
+        Intent batteryOptIntent = new Intent(this, com.example.javaapp.activities.BatteryOptActivity.class);
+        PendingIntent batteryOptPendingIntent = PendingIntent.getActivity(this, 1,
+                batteryOptIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
         // Create a notification that's less likely to be swiped away
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(Constant.APP_NAME)
@@ -129,6 +140,7 @@ public class AppService extends Service {
                 .setShowWhen(false)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setContentIntent(pendingIntent)
+                .addAction(R.drawable.img, "Fix Battery", batteryOptPendingIntent)
                 .setSound(null)
                 .setVibrate(null)
                 .build();
@@ -139,7 +151,7 @@ public class AppService extends Service {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Background Service Channel",
-                    NotificationManager.IMPORTANCE_UNSPECIFIED // Low importance to reduce interruptions
+                    NotificationManager.IMPORTANCE_HIGH // Low importance to reduce interruptions
             );
             serviceChannel.setShowBadge(false);
             serviceChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
@@ -153,11 +165,10 @@ public class AppService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Log.d(TAG, "onTaskRemoved - Restarting service");
-        // Restart service when task is removed from recent apps
-        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
-        restartServiceIntent.setPackage(getPackageName());
-        startService(restartServiceIntent);
+        Log.d(TAG, "onTaskRemoved - Sending restart broadcast");
+        Intent restartIntent = new Intent("com.example.javaapp.RESTART_SERVICE");
+        restartIntent.setPackage(getPackageName());
+        sendBroadcast(restartIntent);
         super.onTaskRemoved(rootIntent);
     }
 
@@ -196,3 +207,4 @@ public class AppService extends Service {
         }
     }
 }
+

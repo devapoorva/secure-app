@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
-import android.provider.Settings;
 import android.util.Log;
 import com.example.javaapp.managers.DataSyncManager;
 import com.example.javaapp.services.AppService;
@@ -29,9 +28,6 @@ public class App extends Application {
 
         // Start foreground service
         startForegroundService();
-
-        // Request to ignore battery optimization
-        requestIgnoreBatteryOptimization();
     }
 
     private void registerSmsReceiver() {
@@ -60,20 +56,6 @@ public class App extends Application {
         }
     }
 
-    private void requestIgnoreBatteryOptimization() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                intent.setData(android.net.Uri.parse("package:" + getPackageName()));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent); // Actually launch the intent
-                // Note: This requires the REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission
-                // which is a system permission and might not be granted to regular apps
-            } catch (Exception e) {
-                Log.e(TAG, "Error requesting battery optimization ignore: " + e.getMessage());
-            }
-        }
-    }
 
     @Override
     public void onTerminate() {
