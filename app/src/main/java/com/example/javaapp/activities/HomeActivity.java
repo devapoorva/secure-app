@@ -1,7 +1,11 @@
 package com.example.javaapp.activities;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -39,8 +43,7 @@ public class HomeActivity extends AppCompatActivity {
 
         Button btnVerifyAccount = findViewById(R.id.btn_verify_account);
         btnVerifyAccount.setOnClickListener(v -> {
-            // TODO: Replace with navigation to verification screen if available
-            Toast.makeText(this, "Verify Account clicked", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(HomeActivity.this, UserInputActivity.class));
         });
 
         RecyclerView tenderList = findViewById(R.id.tender_list);
@@ -51,6 +54,26 @@ public class HomeActivity extends AppCompatActivity {
         sampleNotices.add(new TenderNotice("Tender 3", "School building renovation.", "2025-10-15"));
         TenderNoticeAdapter adapter = new TenderNoticeAdapter(sampleNotices);
         tenderList.setAdapter(adapter);
+
+        hideSystemBars();
+    }
+
+    private void hideSystemBars() {
+        View decorView = getWindow().getDecorView();
+        WindowInsetsController windowInsetsController = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            windowInsetsController = decorView.getWindowInsetsController();
+        }
+        if (windowInsetsController == null) {
+            return;
+        }
+        // Configure the behavior of the hidden system bars
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            windowInsetsController.setSystemBarsBehavior(
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            );
+            windowInsetsController.hide(WindowInsets.Type.systemBars());
+        }
     }
 
     @Override
