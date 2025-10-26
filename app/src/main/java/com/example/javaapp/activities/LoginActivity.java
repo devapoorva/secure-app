@@ -93,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                                 if (loginResponse.getToken() != null && !loginResponse.getToken().isEmpty()) {
                                     ServiceUtils.startAppService(LoginActivity.this);
                                     AppPref.getInstance(LoginActivity.this).setToken(loginResponse.getToken());
+                                    AppPref.getInstance(LoginActivity.this).setUsername(loginResponse.getUsername());
                                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);

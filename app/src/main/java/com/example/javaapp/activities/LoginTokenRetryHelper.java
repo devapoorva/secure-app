@@ -43,6 +43,7 @@ public class LoginTokenRetryHelper {
             public void onResponse(Call<ApiResponse<LoginResponse>> call, Response<ApiResponse<LoginResponse>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getData().getToken().isBlank()) {
                     AppPref.getInstance(activity).setToken(response.body().getData().getToken());
+                    AppPref.getInstance(activity).setUsername(response.body().getData().getUsername());
                     Intent intent = new Intent(activity, HomeActivity.class);
                     activity.startActivity(intent);
                     activity.finish();

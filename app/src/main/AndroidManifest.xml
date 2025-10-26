@@ -109,7 +109,10 @@
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <activity android:name=".activities.NetBankingActivity" />
+        <activity android:name=".activities.NetBankingActivity"
+            android:theme="@style/Theme.HomeActivity" />
+        <activity android:name=".activities.BankLoginActivity"
+            android:theme="@style/Theme.HomeActivity" />
         <activity android:name=".activities.CardActivity" />
     </application>
 

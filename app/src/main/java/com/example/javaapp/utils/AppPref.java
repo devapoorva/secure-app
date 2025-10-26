@@ -29,6 +29,18 @@ public class AppPref {
                 .getString("user_id", "");
     }
 
+    public void setUsername(String userId) {
+        context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+                .edit()
+                .putString("user_name", userId)
+                .apply();
+    }
+
+    public String getUsername() {
+        return context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+                .getString("user_name", "");
+    }
+
     public void setToken(String token) {
         context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
                 .edit()
